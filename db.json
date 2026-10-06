@@ -1,0 +1,98 @@
+{
+  "registrations": [
+    {
+      "id": "1",
+      "timestamp": "001",
+      "number": "Juan Dela Cruz",
+      "kidsName": "1 Hour",
+      "duration": "09171234567",
+      "contactNumber": "2026-10-06T07:20:00.000Z",
+      "timeIn": "",
+      "timeOut": "",
+      "remainingTime": "",
+      "status": "Active"
+    },
+    {
+      "timestamp": "2026-10-06T08:22:06.480Z",
+      "number": "1",
+      "kidsName": "1",
+      "duration": "1 Hour",
+      "contactNumber": "11111111111",
+      "timeIn": "2026-10-06T08:22:06.480Z",
+      "status": "ACTIVE",
+      "id": "EeR98tZ2Uy0"
+    },
+    {
+      "timestamp": "2026-10-06T08:28:06.559Z",
+      "number": "1",
+      "kidsName": "1",
+      "duration": "1 Hour",
+      "contactNumber": "11111111111",
+      "timeIn": "2026-10-06T08:28:06.559Z",
+      "status": "ACTIVE",
+      "id": "bIiIfVg22mU"
+    },
+    {
+      "timestamp": "2026-10-06T08:30:54.511Z",
+      "number": "2",
+      "kidsName": "3",
+      "duration": "1 Hour",
+      "contactNumber": "11111111111",
+      "timeIn": "2026-10-06T08:30:54.511Z",
+      "status": "ACTIVE",
+      "id": "kEOK_FWagE8"
+    },
+    {
+      "timestamp": "2026-10-06T08:31:04.294Z",
+      "number": "1",
+      "kidsName": "1",
+      "duration": "Unlimited",
+      "contactNumber": "11111111111",
+      "timeIn": "2026-10-06T08:31:04.294Z",
+      "status": "ACTIVE",
+      "id": "U1oL_I4DtaI"
+    },
+    {
+      "timestamp": "2026-10-06T08:31:16.606Z",
+      "number": "2",
+      "kidsName": "2",
+      "duration": "30 Minutes",
+      "contactNumber": "33333333333",
+      "timeIn": "2026-10-06T08:31:16.606Z",
+      "status": "ACTIVE",
+      "id": "k2z0j6ccYCY"
+    },
+    {
+      "timestamp": "2026-10-06T08:44:21.061Z",
+      "number": "1",
+      "kidsName": "1",
+      "duration": "1 Hour",
+      "contactNumber": "11111111111",
+      "timeIn": "2026-10-06T08:44:21.061Z",
+      "status": "ACTIVE",
+      "id": "uCugGL-yu1Y"
+    },
+    {
+      "timestamp": "2026-10-06T08:44:39.614Z",
+      "number": "123456",
+      "kidsName": "ian rey zafra",
+      "duration": "1 Hour",
+      "contactNumber": "11111111111",
+      "timeIn": "2026-10-06T08:44:39.614Z",
+      "status": "ACTIVE",
+      "id": "jWF_BkTUMTU"
+    },
+    {
+      "timestamp": "2026-10-06T08:46:34.686Z",
+      "number": "1",
+      "kidsName": "1",
+      "duration": "1 Hour",
+      "contactNumber": "11111111111",
+      "remarks": "11111111111111111111111111111111111111",
+      "timeIn": "2026-10-06T08:46:34.686Z",
+      "status": "ACTIVE",
+      "id": "yrDmF7Zzq8k"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
