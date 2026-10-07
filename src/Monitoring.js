@@ -282,25 +282,6 @@ function Monitoring() {
           SEARCH
       ================================= */}
 
-      <TextField
-        label="Search Kids Name"
-        variant="outlined"
-        size="small"
-        value={searchName}
-        onChange={(e) => setSearchName(e.target.value)}
-        sx={{
-          mb: 2,
-          width: 300,
-        }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          ),
-        }}
-      />
-
       {/* ================================
           LOADING
       ================================= */}
@@ -316,185 +297,219 @@ function Monitoring() {
           <CircularProgress />
         </Box>
       ) : (
-        <TableContainer component={Paper}>
-          <Table
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "end",
+            width: "80%",
+            height: "100vh",
+            margin: "auto",
+            p: 2,
+          }}
+        >
+          <TextField
+            label="Search Kids Name"
+            variant="outlined"
+            size="small"
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
             sx={{
-              minWidth: 650,
+              mb: 2,
+              width: 300,
             }}
-          >
-            {/* ============================
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TableContainer component={Paper}>
+            <Table
+              sx={{
+                margin: "auto",
+
+                minWidth: 650,
+              }}
+            >
+              {/* ============================
                 HEADER
             ============================= */}
 
-            <TableHead>
-              <TableRow>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                  }}
-                >
-                  Reg. Number
-                </TableCell>
+              <TableHead>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Reg. Number
+                  </TableCell>
 
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                  }}
-                >
-                  Kids Name
-                </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Kids Name
+                  </TableCell>
 
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                  }}
-                >
-                  Duration
-                </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Duration
+                  </TableCell>
 
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                  }}
-                >
-                  Contact Number
-                </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Contact Number
+                  </TableCell>
 
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                  }}
-                >
-                  Time In
-                </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Time In
+                  </TableCell>
 
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                  }}
-                >
-                  Time Out
-                </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Time Out
+                  </TableCell>
 
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                  }}
-                >
-                  Remaining Time
-                </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Remaining Time
+                  </TableCell>
 
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                  }}
-                >
-                  Status
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                  }}
-                >
-                  Remarks
-                </TableCell>
-              </TableRow>
-            </TableHead>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Status
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Remarks
+                  </TableCell>
+                </TableRow>
+              </TableHead>
 
-            {/* ============================
+              {/* ============================
                 BODY
             ============================= */}
 
-            <TableBody>
-              {filteredArray.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={9} align="center">
-                    <Typography
-                      sx={{
-                        py: 3,
-                      }}
-                    >
-                      No registrations found.
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredArray.map((item, index) => {
-                  const timeIn = new Date(item.timestamp).getTime();
+              <TableBody>
+                {filteredArray.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={9} align="center">
+                      <Typography
+                        sx={{
+                          py: 3,
+                        }}
+                      >
+                        No registrations found.
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredArray.map((item, index) => {
+                    const timeIn = new Date(item.timestamp).getTime();
 
-                  const durationMs = getDurationMs(item.duration);
+                    const durationMs = getDurationMs(item.duration);
 
-                  const timeOut =
-                    durationMs === null ? null : timeIn + durationMs;
+                    const timeOut =
+                      durationMs === null ? null : timeIn + durationMs;
 
-                  const expired =
-                    item.duration !== "Unlimited" &&
-                    (!item.timestamp || isNaN(timeIn) || Date.now() >= timeOut);
+                    const expired =
+                      item.duration !== "Unlimited" &&
+                      (!item.timestamp ||
+                        isNaN(timeIn) ||
+                        Date.now() >= timeOut);
 
-                  return (
-                    <TableRow
-                      key={item.id || index}
-                      hover
-                      sx={{
-                        backgroundColor: expired ? "#ffcccc" : "inherit",
-                      }}
-                    >
-                      {/* Registration Number */}
+                    return (
+                      <TableRow
+                        key={item.id || index}
+                        hover
+                        sx={{
+                          backgroundColor: expired ? "#ffcccc" : "inherit",
+                        }}
+                      >
+                        {/* Registration Number */}
 
-                      <TableCell>{item.number}</TableCell>
+                        <TableCell>{item.number}</TableCell>
 
-                      {/* Kids Name */}
+                        {/* Kids Name */}
 
-                      <TableCell>{item.kidsName}</TableCell>
+                        <TableCell>{item.kidsName}</TableCell>
 
-                      {/* Duration */}
+                        {/* Duration */}
 
-                      <TableCell>{item.duration}</TableCell>
+                        <TableCell>{item.duration}</TableCell>
 
-                      {/* Contact */}
+                        {/* Contact */}
 
-                      <TableCell>{item.contactNumber}</TableCell>
+                        <TableCell>{item.contactNumber}</TableCell>
 
-                      {/* Time In */}
+                        {/* Time In */}
 
-                      <TableCell>{formatTime(item.timestamp)}</TableCell>
+                        <TableCell>{formatTime(item.timestamp)}</TableCell>
 
-                      {/* Time Out */}
+                        {/* Time Out */}
 
-                      <TableCell>
-                        {formatTimeOut(item.timestamp, item.duration)}
-                        {/* {formatTimeOut(item.timeOut, item.duration)} */}
-                      </TableCell>
+                        <TableCell>
+                          {formatTimeOut(item.timestamp, item.duration)}
+                          {/* {formatTimeOut(item.timeOut, item.duration)} */}
+                        </TableCell>
 
-                      {/* Countdown */}
+                        {/* Countdown */}
 
-                      <TableCell>
-                        <Countdown
-                          timestamp={item.timestamp}
-                          duration={item.duration}
-                        />
-                      </TableCell>
+                        <TableCell>
+                          <Countdown
+                            timestamp={item.timestamp}
+                            duration={item.duration}
+                          />
+                        </TableCell>
 
-                      {/* Status */}
+                        {/* Status */}
 
-                      <TableCell>
-                        <strong
-                          style={{
-                            color: expired ? "red" : "green",
-                          }}
-                        >
-                          {expired ? "EXPIRED" : "ACTIVE"}
-                        </strong>
-                      </TableCell>
+                        <TableCell>
+                          <strong
+                            style={{
+                              color: expired ? "red" : "green",
+                            }}
+                          >
+                            {expired ? "EXPIRED" : "ACTIVE"}
+                          </strong>
+                        </TableCell>
 
-                      <TableCell>{item.remarks}</TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                        <TableCell>{item.remarks}</TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       )}
     </Box>
   );
