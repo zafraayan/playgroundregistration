@@ -48,6 +48,12 @@ const Registration = () => {
     setSuccess("");
     setApiError("");
 
+    // Create Time In
+    const timeIn = new Date();
+
+    // Add 5 minutes to Time In
+    const timeOut = new Date(timeIn.getTime() + 5 * 60 * 1000);
+
     // Create registration object
     const registrationData = {
       timestamp: new Date().toISOString(),
@@ -62,7 +68,9 @@ const Registration = () => {
 
       remarks: data.remarks,
 
-      timeIn: new Date().toISOString(),
+      timeIn: timeIn.toISOString(),
+
+      timeOut: timeOut.toISOString(),
 
       status: "ACTIVE",
     };
@@ -226,6 +234,7 @@ const Registration = () => {
             fullWidth
             label="Duration"
             margin="normal"
+            defaultValue="1 Hour"
             {...register("duration", {
               required: "Please select a duration",
             })}

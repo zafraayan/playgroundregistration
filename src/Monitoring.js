@@ -333,14 +333,6 @@ function Monitoring() {
                     fontWeight: "bold",
                   }}
                 >
-                  Timestamp
-                </TableCell>
-
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                  }}
-                >
                   Reg. Number
                 </TableCell>
 
@@ -447,10 +439,6 @@ function Monitoring() {
                         backgroundColor: expired ? "#ffcccc" : "inherit",
                       }}
                     >
-                      {/* Timestamp */}
-
-                      <TableCell>{formatTime(item.timestamp)}</TableCell>
-
                       {/* Registration Number */}
 
                       <TableCell>{item.number}</TableCell>
@@ -475,6 +463,7 @@ function Monitoring() {
 
                       <TableCell>
                         {formatTimeOut(item.timestamp, item.duration)}
+                        {/* {formatTimeOut(item.timeOut, item.duration)} */}
                       </TableCell>
 
                       {/* Countdown */}
