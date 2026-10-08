@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
-
 import { RegistrationContext } from "./context/RegistrationContext";
 
 import {
+  Box,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -14,10 +15,15 @@ import {
   InputAdornment,
   CircularProgress,
   Typography,
-  Box,
+  MenuItem,
+  Tooltip,
 } from "@mui/material";
 
 import SearchIcon from "@mui/icons-material/Search";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 import axios from "axios";
 
@@ -221,10 +227,23 @@ function Monitoring() {
   const [loading, setLoading] = useState(true);
 
   // ========================================
-  // REFRESH TABLE
+  // CURRENT TIME
   // ========================================
 
-  const [, setCurrentTime] = useState(Date.now());
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
+  // ========================================
+  // EDITING
+  // ========================================
+
+  const [editingId, setEditingId] = useState(null);
+
+  const [editData, setEditData] = useState({
+    kidsName: "",
+    contactNumber: "",
+    duration: "",
+    remarks: "",
+  });
 
   // ========================================
   // FETCH API
@@ -265,6 +284,87 @@ function Monitoring() {
   }, []);
 
   // ========================================
+  // EDIT
+  // ========================================
+
+  const handleEdit = (item) => {
+    setEditingId(item.id);
+
+    setEditData({
+      kidsName: item.kidsName || "",
+      contactNumber: item.contactNumber || "",
+      duration: item.duration || "1 Hour",
+      remarks: item.remarks || "",
+    });
+  };
+
+  // ========================================
+  // CANCEL EDIT
+  // ========================================
+
+  const handleCancel = () => {
+    setEditingId(null);
+
+    setEditData({
+      kidsName: "",
+      contactNumber: "",
+      duration: "",
+      remarks: "",
+    });
+  };
+
+  // ========================================
+  // UPDATE
+  // ========================================
+
+  const handleUpdate = async (id) => {
+    try {
+      const response = await axios.patch(`${API_URL}/${id}`, editData);
+
+      setRegArray((prev) =>
+        prev.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                ...response.data,
+              }
+            : item,
+        ),
+      );
+
+      handleCancel();
+
+      console.log("Registration updated successfully.");
+    } catch (error) {
+      console.error("Error updating registration:", error);
+    }
+  };
+
+  // ========================================
+  // DELETE
+  // ========================================
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this registration?",
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+
+      setRegArray((prev) => prev.filter((item) => item.id !== id));
+
+      console.log("Registration deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting registration:", error);
+    }
+  };
+
+  // ========================================
   // SEARCH
   // ========================================
 
@@ -280,10 +380,6 @@ function Monitoring() {
     <Box>
       {/* ================================
           SEARCH
-      ================================= */}
-
-      {/* ================================
-          LOADING
       ================================= */}
 
       {loading ? (
@@ -302,12 +398,14 @@ function Monitoring() {
             display: "flex",
             flexDirection: "column",
             alignItems: "end",
-            width: "80%",
+            width: "95%",
             height: "100vh",
             margin: "auto",
             p: 2,
           }}
         >
+          {/* SEARCH */}
+
           <TextField
             label="Search Kids Name"
             variant="outlined"
@@ -326,17 +424,21 @@ function Monitoring() {
               ),
             }}
           />
+
+          {/* ================================
+              TABLE
+          ================================= */}
+
           <TableContainer component={Paper}>
             <Table
               sx={{
                 margin: "auto",
-
-                minWidth: 650,
+                minWidth: 1000,
               }}
             >
               {/* ============================
-                HEADER
-            ============================= */}
+                  HEADER
+              ============================= */}
 
               <TableHead>
                 <TableRow>
@@ -403,6 +505,7 @@ function Monitoring() {
                   >
                     Status
                   </TableCell>
+
                   <TableCell
                     sx={{
                       fontWeight: "bold",
@@ -410,17 +513,26 @@ function Monitoring() {
                   >
                     Remarks
                   </TableCell>
+
+                  <TableCell
+                    sx={{
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    Actions
+                  </TableCell>
                 </TableRow>
               </TableHead>
 
               {/* ============================
-                BODY
-            ============================= */}
+                  BODY
+              ============================= */}
 
               <TableBody>
                 {filteredArray.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} align="center">
+                    <TableCell colSpan={10} align="center">
                       <Typography
                         sx={{
                           py: 3,
@@ -445,6 +557,8 @@ function Monitoring() {
                         isNaN(timeIn) ||
                         Date.now() >= timeOut);
 
+                    const isEditing = editingId === item.id;
+
                     return (
                       <TableRow
                         key={item.id || index}
@@ -453,43 +567,116 @@ function Monitoring() {
                           backgroundColor: expired ? "#ffcccc" : "inherit",
                         }}
                       >
-                        {/* Registration Number */}
+                        {/* ==========================
+                            REGISTRATION NUMBER
+                        =========================== */}
 
                         <TableCell>{item.number}</TableCell>
 
-                        {/* Kids Name */}
+                        {/* ==========================
+                            KIDS NAME
+                        =========================== */}
 
-                        <TableCell>{item.kidsName}</TableCell>
+                        <TableCell>
+                          {isEditing ? (
+                            <TextField
+                              size="small"
+                              fullWidth
+                              value={editData.kidsName}
+                              onChange={(e) =>
+                                setEditData({
+                                  ...editData,
+                                  kidsName: e.target.value,
+                                })
+                              }
+                            />
+                          ) : (
+                            item.kidsName
+                          )}
+                        </TableCell>
 
-                        {/* Duration */}
+                        {/* ==========================
+                            DURATION
+                        =========================== */}
 
-                        <TableCell>{item.duration}</TableCell>
+                        <TableCell>
+                          {isEditing ? (
+                            <TextField
+                              select
+                              size="small"
+                              value={editData.duration}
+                              onChange={(e) =>
+                                setEditData({
+                                  ...editData,
+                                  duration: e.target.value,
+                                })
+                              }
+                            >
+                              <MenuItem value="30 Minutes">30 Minutes</MenuItem>
 
-                        {/* Contact */}
+                              <MenuItem value="1 Hour">1 Hour</MenuItem>
 
-                        <TableCell>{item.contactNumber}</TableCell>
+                              <MenuItem value="Unlimited">Unlimited</MenuItem>
+                            </TextField>
+                          ) : (
+                            item.duration
+                          )}
+                        </TableCell>
 
-                        {/* Time In */}
+                        {/* ==========================
+                            CONTACT
+                        =========================== */}
+
+                        <TableCell>
+                          {isEditing ? (
+                            <TextField
+                              size="small"
+                              value={editData.contactNumber}
+                              onChange={(e) =>
+                                setEditData({
+                                  ...editData,
+                                  contactNumber: e.target.value,
+                                })
+                              }
+                            />
+                          ) : (
+                            item.contactNumber
+                          )}
+                        </TableCell>
+
+                        {/* ==========================
+                            TIME IN
+                        =========================== */}
 
                         <TableCell>{formatTime(item.timestamp)}</TableCell>
 
-                        {/* Time Out */}
+                        {/* ==========================
+                            TIME OUT
+                        =========================== */}
 
                         <TableCell>
-                          {formatTimeOut(item.timestamp, item.duration)}
-                          {/* {formatTimeOut(item.timeOut, item.duration)} */}
+                          {formatTimeOut(
+                            item.timestamp,
+                            isEditing ? editData.duration : item.duration,
+                          )}
                         </TableCell>
 
-                        {/* Countdown */}
+                        {/* ==========================
+                            COUNTDOWN
+                        =========================== */}
 
                         <TableCell>
                           <Countdown
                             timestamp={item.timestamp}
-                            duration={item.duration}
+                            duration={
+                              isEditing ? editData.duration : item.duration
+                            }
                           />
                         </TableCell>
 
-                        {/* Status */}
+                        {/* ==========================
+                            STATUS
+                        =========================== */}
 
                         <TableCell>
                           <strong
@@ -501,7 +688,87 @@ function Monitoring() {
                           </strong>
                         </TableCell>
 
-                        <TableCell>{item.remarks}</TableCell>
+                        {/* ==========================
+                            REMARKS
+                        =========================== */}
+
+                        <TableCell>
+                          {isEditing ? (
+                            <TextField
+                              size="small"
+                              value={editData.remarks}
+                              onChange={(e) =>
+                                setEditData({
+                                  ...editData,
+                                  remarks: e.target.value,
+                                })
+                              }
+                            />
+                          ) : (
+                            item.remarks
+                          )}
+                        </TableCell>
+
+                        {/* ==========================
+                            ACTIONS
+                        =========================== */}
+
+                        <TableCell
+                          sx={{
+                            whiteSpace: "nowrap",
+                            textAlign: "center",
+                          }}
+                        >
+                          {isEditing ? (
+                            <>
+                              {/* UPDATE */}
+
+                              <Tooltip title="Update">
+                                <IconButton
+                                  color="success"
+                                  onClick={() => handleUpdate(item.id)}
+                                >
+                                  <SaveIcon />
+                                </IconButton>
+                              </Tooltip>
+
+                              {/* CANCEL */}
+
+                              <Tooltip title="Cancel">
+                                <IconButton
+                                  color="inherit"
+                                  onClick={handleCancel}
+                                >
+                                  <CancelIcon />
+                                </IconButton>
+                              </Tooltip>
+                            </>
+                          ) : (
+                            <>
+                              {/* EDIT */}
+
+                              <Tooltip title="Edit">
+                                <IconButton
+                                  color="primary"
+                                  onClick={() => handleEdit(item)}
+                                >
+                                  <EditIcon />
+                                </IconButton>
+                              </Tooltip>
+
+                              {/* DELETE */}
+
+                              <Tooltip title="Delete">
+                                <IconButton
+                                  color="error"
+                                  onClick={() => handleDelete(item.id)}
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                              </Tooltip>
+                            </>
+                          )}
+                        </TableCell>
                       </TableRow>
                     );
                   })

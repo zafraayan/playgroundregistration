@@ -133,7 +133,8 @@ const Registration = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#f5f5f5",
+        // backgroundColor: "#f5f5f5",
+        // backgroundColor: "rgba(255, 255, 255, 0.95)",
         p: 2,
       }}
     >

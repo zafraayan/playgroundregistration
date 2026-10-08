@@ -1,51 +1,28 @@
 {
   "registrations": [
     {
-      "timestamp": "2026-10-07T05:58:22.003Z",
-      "number": "1",
-      "kidsName": "1",
-      "duration": "1 Hour",
-      "contactNumber": "11111111111",
-      "remarks": "1",
-      "timeIn": "2026-10-07T05:58:22.003Z",
-      "status": "ACTIVE",
-      "id": "qOG79OmIi48"
-    },
-    {
-      "timestamp": "2026-10-07T06:46:05.593Z",
-      "number": "1",
-      "kidsName": "1",
-      "duration": "1 Hour",
-      "contactNumber": "11111111111",
-      "remarks": "1",
-      "timeIn": "2026-10-07T06:46:05.593Z",
-      "timeOut": "2026-10-07T06:51:05.593Z",
-      "status": "ACTIVE",
-      "id": "sdyeBqxDyY8"
-    },
-    {
-      "timestamp": "2026-10-07T06:52:42.056Z",
-      "number": "1",
-      "kidsName": "1",
-      "duration": "30 Minutes",
-      "contactNumber": "11111111111",
-      "remarks": "1",
-      "timeIn": "2026-10-07T06:52:42.056Z",
-      "timeOut": "2026-10-07T06:57:42.056Z",
-      "status": "ACTIVE",
-      "id": "L0ie_B4gm5I"
-    },
-    {
-      "timestamp": "2026-10-07T07:23:31.208Z",
+      "timestamp": "2026-10-08T05:56:49.475Z",
       "number": "2",
-      "kidsName": "22222",
-      "duration": "30 Minutes",
+      "kidsName": "2",
+      "duration": "1 Hour",
       "contactNumber": "22222222222",
-      "remarks": "2",
-      "timeIn": "2026-10-07T07:23:31.208Z",
-      "timeOut": "2026-10-07T07:28:31.208Z",
+      "remarks": "4",
+      "timeIn": "2026-10-08T05:56:49.475Z",
+      "timeOut": "2026-10-08T06:01:49.475Z",
       "status": "ACTIVE",
-      "id": "CUWEhLEqDks"
+      "id": "fN2lqQnPcg4"
+    },
+    {
+      "timestamp": "2026-10-08T06:35:22.268Z",
+      "number": "11111112",
+      "kidsName": "jkhkj",
+      "duration": "1 Hour",
+      "contactNumber": "12345678988",
+      "remarks": "4",
+      "timeIn": "2026-10-08T06:35:22.268Z",
+      "timeOut": "2026-10-08T06:40:22.268Z",
+      "status": "ACTIVE",
+      "id": "-R8IKdcfv_Y"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
