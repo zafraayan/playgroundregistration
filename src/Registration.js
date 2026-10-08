@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import axios from "axios";
 
 import { RegistrationContext } from "./context/RegistrationContext";
@@ -13,6 +13,7 @@ import {
   Typography,
   CircularProgress,
   Alert,
+  Divider,
 } from "@mui/material";
 
 const API_URL = "http://localhost:3001/registrations";
@@ -28,11 +29,17 @@ const Registration = () => {
     register,
     handleSubmit,
     reset,
+    control,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
-      number: "",
-      kidsName: "",
+      kids: [
+        {
+          number: "",
+          kidsName: "",
+        },
+      ],
       duration: "1 Hour",
       contactNumber: "",
       remarks: "",
@@ -40,7 +47,36 @@ const Registration = () => {
   });
 
   // ========================================
-  // SUBMIT REGISTRATION
+  // KIDS ARRAY
+  // ========================================
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "kids",
+  });
+
+  const selectedDuration = watch("duration");
+
+  // ========================================
+  // CALCULATE TIME OUT
+  // ========================================
+
+  const calculateTimeOut = (timeIn, duration) => {
+    const timeOut = new Date(timeIn);
+
+    if (duration === "30 Minutes") {
+      timeOut.setMinutes(timeOut.getMinutes() + 30);
+    } else if (duration === "1 Hour") {
+      timeOut.setHours(timeOut.getHours() + 1);
+    } else if (duration === "Unlimited") {
+      return null;
+    }
+
+    return timeOut;
+  };
+
+  // ========================================
+  // SUBMIT BATCH REGISTRATION
   // ========================================
 
   const onSubmit = async (data) => {
@@ -48,44 +84,52 @@ const Registration = () => {
     setSuccess("");
     setApiError("");
 
-    // Create Time In
-    const timeIn = new Date();
-
-    // Add 5 minutes to Time In
-    const timeOut = new Date(timeIn.getTime() + 5 * 60 * 1000);
-
-    // Create registration object
-    const registrationData = {
-      timestamp: new Date().toISOString(),
-
-      number: data.number,
-
-      kidsName: data.kidsName,
-
-      duration: data.duration,
-
-      contactNumber: data.contactNumber,
-
-      remarks: data.remarks,
-
-      timeIn: timeIn.toISOString(),
-
-      timeOut: timeOut.toISOString(),
-
-      status: "ACTIVE",
-    };
-
     try {
       // ====================================
-      // SAVE TO REST API
+      // CREATE ONE RECORD FOR EACH KID
       // ====================================
 
-      const response = await axios.post(API_URL, registrationData);
+      const registrations = data.kids.map((kid) => {
+        const timeIn = new Date();
 
-      console.log("Registration saved:", response.data);
+        const timeOut = calculateTimeOut(timeIn, data.duration);
+
+        return {
+          timestamp: new Date().toISOString(),
+
+          // Each kid has their own number
+          number: kid.number,
+
+          // Each kid has their own name
+          kidsName: kid.kidsName,
+
+          // Shared information
+          duration: data.duration,
+
+          contactNumber: data.contactNumber,
+
+          remarks: data.remarks,
+
+          timeIn: timeIn.toISOString(),
+
+          timeOut: timeOut ? timeOut.toISOString() : null,
+
+          status: "ACTIVE",
+        };
+      });
 
       // ====================================
-      // REFRESH MONITORING
+      // SAVE ALL KIDS
+      // ====================================
+
+      await Promise.all(
+        registrations.map((registration) => axios.post(API_URL, registration)),
+      );
+
+      console.log("Batch registration saved:", registrations);
+
+      // ====================================
+      // REFRESH REGISTRATION LIST
       // ====================================
 
       refreshRegistrations();
@@ -94,23 +138,30 @@ const Registration = () => {
       // SUCCESS MESSAGE
       // ====================================
 
-      setSuccess("Registration successfully added!");
+      setSuccess(
+        `${registrations.length} kid${
+          registrations.length > 1 ? "s" : ""
+        } successfully registered!`,
+      );
 
       // ====================================
       // RESET FORM
       // ====================================
 
       reset({
-        number: "",
-        kidsName: "",
+        kids: [
+          {
+            number: "",
+            kidsName: "",
+          },
+        ],
         duration: "1 Hour",
         contactNumber: "",
         remarks: "",
       });
     } catch (error) {
-      console.error("Error saving registration:", error);
+      console.error("Error saving registrations:", error);
 
-      // More useful error message
       if (error.response) {
         console.error("Server response:", error.response.data);
 
@@ -120,7 +171,7 @@ const Registration = () => {
           "Cannot connect to the API server. Make sure localhost:3001 is running.",
         );
       } else {
-        setApiError("Failed to save registration.");
+        setApiError("Failed to save registrations.");
       }
     } finally {
       setLoading(false);
@@ -133,8 +184,6 @@ const Registration = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        // backgroundColor: "#f5f5f5",
-        // backgroundColor: "rgba(255, 255, 255, 0.95)",
         p: 2,
       }}
     >
@@ -142,7 +191,7 @@ const Registration = () => {
         elevation={3}
         sx={{
           width: "100%",
-          maxWidth: 450,
+          maxWidth: 600,
           p: 4,
         }}
       >
@@ -155,7 +204,7 @@ const Registration = () => {
         </Typography>
 
         {/* ==================================
-            SUCCESS
+            SUCCESS MESSAGE
         ================================== */}
 
         {success && (
@@ -165,7 +214,7 @@ const Registration = () => {
         )}
 
         {/* ==================================
-            ERROR
+            ERROR MESSAGE
         ================================== */}
 
         {apiError && (
@@ -178,53 +227,109 @@ const Registration = () => {
             FORM
         ================================== */}
 
-        <Box
-          component="form"
-          onSubmit={handleSubmit(onSubmit)}
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+        <Box component="form" onSubmit={handleSubmit(onSubmit)}>
           {/* ==================================
-              NUMBER
+              KIDS
           ================================== */}
 
-          <TextField
-            fullWidth
-            label="Number"
-            margin="normal"
-            slotProps={{
-              htmlInput: {
-                inputMode: "numeric",
-              },
-            }}
-            {...register("number", {
-              required: "Number is required",
+          {fields.map((field, index) => (
+            <Box
+              key={field.id}
+              sx={{
+                mb: 2,
+                p: 2,
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+              }}
+            >
+              <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
+                Kid {index + 1}
+              </Typography>
 
-              pattern: {
-                value: /^[0-9]+$/,
-                message: "Enter numbers only",
-              },
-            })}
-            error={!!errors.number}
-            helperText={errors.number?.message}
-          />
+              {/* NUMBER + NAME */}
+
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  alignItems: "flex-start",
+                }}
+              >
+                {/* NUMBER */}
+
+                <TextField
+                  label="Number"
+                  sx={{ width: "35%" }}
+                  size="small"
+                  slotProps={{
+                    htmlInput: {
+                      inputMode: "numeric",
+                    },
+                  }}
+                  {...register(`kids.${index}.number`, {
+                    required: "Number is required",
+
+                    pattern: {
+                      value: /^[0-9]+$/,
+                      message: "Enter numbers only",
+                    },
+                  })}
+                  error={!!errors.kids?.[index]?.number}
+                  helperText={errors.kids?.[index]?.number?.message}
+                />
+
+                {/* KID NAME */}
+
+                <TextField
+                  fullWidth
+                  label="Kids Name"
+                  size="small"
+                  {...register(`kids.${index}.kidsName`, {
+                    required: "Kids name is required",
+                  })}
+                  error={!!errors.kids?.[index]?.kidsName}
+                  helperText={errors.kids?.[index]?.kidsName?.message}
+                />
+              </Box>
+
+              {/* REMOVE BUTTON */}
+
+              {fields.length > 1 && (
+                <Button
+                  type="button"
+                  color="error"
+                  size="small"
+                  sx={{ mt: 1 }}
+                  onClick={() => remove(index)}
+                >
+                  Remove Kid
+                </Button>
+              )}
+            </Box>
+          ))}
 
           {/* ==================================
-              KIDS NAME
+              ADD ANOTHER KID
           ================================== */}
 
-          <TextField
+          <Button
+            type="button"
+            variant="outlined"
             fullWidth
-            label="Kids Name"
-            margin="normal"
-            {...register("kidsName", {
-              required: "Kids name is required",
-            })}
-            error={!!errors.kidsName}
-            helperText={errors.kidsName?.message}
-          />
+            size="small"
+            onClick={() =>
+              append({
+                number: "",
+                kidsName: "",
+              })
+            }
+            sx={{ mb: 2 }}
+          >
+            + Add Another Kid
+          </Button>
+
+          <Divider sx={{ mb: 2 }} />
 
           {/* ==================================
               DURATION
@@ -235,7 +340,7 @@ const Registration = () => {
             fullWidth
             label="Duration"
             margin="normal"
-            defaultValue="1 Hour"
+            size="small"
             {...register("duration", {
               required: "Please select a duration",
             })}
@@ -257,6 +362,7 @@ const Registration = () => {
             fullWidth
             label="Contact Number"
             margin="normal"
+            size="small"
             slotProps={{
               htmlInput: {
                 maxLength: 11,
@@ -283,12 +389,34 @@ const Registration = () => {
             fullWidth
             label="Remarks"
             margin="normal"
+            size="small"
             multiline
             rows={3}
             {...register("remarks")}
-            error={!!errors.remarks}
-            helperText={errors.remarks?.message}
           />
+
+          {/* ==================================
+              SUMMARY
+          ================================== */}
+
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 2,
+              color: "text.secondary",
+            }}
+          >
+            Total kids: <strong>{fields.length}</strong>
+          </Typography>
+
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.secondary",
+            }}
+          >
+            Duration: <strong>{selectedDuration}</strong>
+          </Typography>
 
           {/* ==================================
               REGISTER BUTTON
@@ -308,7 +436,7 @@ const Registration = () => {
                 Saving...
               </>
             ) : (
-              "Register"
+              "Register All Kids"
             )}
           </Button>
         </Box>
